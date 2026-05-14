@@ -13,10 +13,6 @@ interface AdoptionModalProps {
 export function AdoptionModal({ perro, onClose }: AdoptionModalProps) {
   const [submitted, setSubmitted] = useState(false)
 
-  const handleSuccess = () => {
-    setSubmitted(true)
-  }
-
   const handleClose = () => {
     setSubmitted(false)
     onClose()
@@ -24,31 +20,33 @@ export function AdoptionModal({ perro, onClose }: AdoptionModalProps) {
 
   return (
     <Dialog open={!!perro} onOpenChange={handleClose}>
-      <DialogContent className="w-[95vw] max-w-lg max-h-[92vh] overflow-y-auto rounded-2xl p-4 sm:p-6">
-        <DialogHeader>
-          <DialogTitle className="text-orange-700">
-            {submitted ? '¡Solicitud enviada!' : 'Formulario de Adopción'}
+      <DialogContent className="w-[96vw] max-w-2xl h-[94vh] flex flex-col p-0 rounded-2xl overflow-hidden">
+        <DialogHeader className="px-5 pt-5 pb-3 border-b border-gray-100 flex-shrink-0">
+          <DialogTitle className="text-orange-700 text-lg font-bold">
+            {submitted ? '¡Solicitud enviada!' : 'Solicitud de Adopción — Un Final Feliz'}
           </DialogTitle>
         </DialogHeader>
 
-        {submitted ? (
-          <div className="text-center py-8 space-y-4">
-            <div className="text-6xl">🎉</div>
-            <h3 className="text-xl font-bold text-gray-800">¡Gracias por tu interés!</h3>
-            <p className="text-gray-600">
-              Hemos recibido tu solicitud de adopción. Nos pondremos en contacto contigo
-              muy pronto para coordinar los próximos pasos.
-            </p>
-            <button
-              onClick={handleClose}
-              className="mt-4 px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
-            >
-              Cerrar
-            </button>
-          </div>
-        ) : perro ? (
-          <AdoptionForm perro={perro} onSuccess={handleSuccess} onCancel={handleClose} />
-        ) : null}
+        <div className="flex-1 overflow-y-auto px-5 pb-5">
+          {submitted ? (
+            <div className="text-center py-12 space-y-4">
+              <div className="text-6xl">🎉</div>
+              <h3 className="text-xl font-bold text-gray-800">¡Gracias por tu interés!</h3>
+              <p className="text-gray-600 max-w-sm mx-auto">
+                Hemos recibido tu solicitud de adopción. Nos pondremos en contacto contigo
+                muy pronto para coordinar los próximos pasos.
+              </p>
+              <button
+                onClick={handleClose}
+                className="mt-4 px-8 py-3 bg-orange-500 text-white rounded-xl font-semibold hover:bg-orange-600 transition-colors"
+              >
+                Cerrar
+              </button>
+            </div>
+          ) : perro ? (
+            <AdoptionForm perro={perro} onSuccess={() => setSubmitted(true)} onCancel={handleClose} />
+          ) : null}
+        </div>
       </DialogContent>
     </Dialog>
   )
