@@ -24,7 +24,7 @@ export function AdoptionModal({ perro, onClose }: AdoptionModalProps) {
 
   return (
     <Dialog open={!!perro} onOpenChange={handleClose}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-[95vw] max-w-lg max-h-[92vh] overflow-y-auto rounded-2xl p-4 sm:p-6">
         <DialogHeader>
           <DialogTitle className="text-orange-700">
             {submitted ? '¡Solicitud enviada!' : 'Formulario de Adopción'}
