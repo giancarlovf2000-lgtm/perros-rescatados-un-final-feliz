@@ -1,5 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { DogGrid } from '@/components/public/DogGrid'
+import { SiteHeader } from '@/components/public/SiteHeader'
+import { SiteFooter } from '@/components/public/SiteFooter'
 import type { Perro } from '@/lib/types'
 
 export const revalidate = 60
@@ -14,29 +16,7 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen bg-amber-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-xl sm:text-2xl">🐾</span>
-            <div>
-              <span className="font-bold text-orange-600 text-base sm:text-lg leading-tight block">Perros Rescatados</span>
-              <span className="text-xs text-amber-700 leading-tight block">Un Final Feliz</span>
-            </div>
-          </div>
-          <nav className="flex items-center gap-3 sm:gap-4">
-            <a href="#perros" className="text-xs sm:text-sm text-gray-600 hover:text-orange-600 transition-colors">
-              Adoptar
-            </a>
-            <a href="#como-funciona" className="hidden sm:block text-sm text-gray-600 hover:text-orange-600 transition-colors">
-              ¿Cómo funciona?
-            </a>
-            <a href="#contacto" className="text-xs sm:text-sm text-gray-600 hover:text-orange-600 transition-colors">
-              Contacto
-            </a>
-          </nav>
-        </div>
-      </header>
+      <SiteHeader />
 
       {/* Hero */}
       <section className="bg-gradient-to-br from-orange-500 via-orange-400 to-amber-300 py-14 sm:py-20 px-4 text-center">
@@ -45,9 +25,12 @@ export default async function HomePage() {
           <h1 className="text-3xl sm:text-5xl font-extrabold text-white drop-shadow-sm mb-4 leading-tight">
             Dales el hogar<br />que merecen
           </h1>
-          <p className="text-base sm:text-xl text-orange-50 mb-8 max-w-xl mx-auto leading-relaxed">
+          <p className="text-base sm:text-lg text-orange-50 mb-3 max-w-xl mx-auto leading-relaxed">
             Cada perro rescatado sueña con una familia que lo ame.
             Encuentra a tu compañero ideal y dale su <strong>final feliz</strong>.
+          </p>
+          <p className="text-sm text-orange-100 italic mb-8 opacity-90">
+            "Rescatamos, curamos y preparamos vidas para un verdadero Final Feliz." 🐾
           </p>
           <a
             href="#perros"
@@ -85,6 +68,18 @@ export default async function HomePage() {
         <DogGrid perros={(perros as Perro[]) ?? []} />
       </section>
 
+      {/* Adoption quote */}
+      <section className="bg-orange-500 py-12 px-4">
+        <div className="max-w-2xl mx-auto text-center">
+          <p className="text-lg sm:text-xl font-medium text-white leading-relaxed italic">
+            "Adoptar es darle a un animal abandonado la oportunidad de volver a confiar,
+            amar y tener un hogar lleno de cariño. No cambias solo una vida…
+            ambos se rescatan mutuamente."
+          </p>
+          <p className="text-orange-200 mt-3 text-2xl">🐾</p>
+        </div>
+      </section>
+
       {/* How it works */}
       <section id="como-funciona" className="bg-white py-12 sm:py-16 px-4">
         <div className="max-w-4xl mx-auto text-center">
@@ -105,19 +100,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer id="contacto" className="bg-amber-900 text-amber-100 py-8 sm:py-10 px-4">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3 text-center sm:text-left">
-          <div>
-            <div className="flex items-center justify-center sm:justify-start gap-2 mb-1">
-              <span className="text-xl">🐾</span>
-              <span className="font-bold text-white text-sm sm:text-base">Perros Rescatados — Un Final Feliz</span>
-            </div>
-            <p className="text-xs sm:text-sm text-amber-300">Cada perro merece un hogar lleno de amor.</p>
-          </div>
-          <p className="text-xs sm:text-sm text-amber-400">© {new Date().getFullYear()} Un Final Feliz</p>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   )
 }
