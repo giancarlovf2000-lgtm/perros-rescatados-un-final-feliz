@@ -37,6 +37,7 @@ export function AdoptionModal({ perro, onClose }: AdoptionModalProps) {
                 muy pronto para coordinar los próximos pasos.
               </p>
               <button
+                type="button"
                 onClick={handleClose}
                 className="mt-4 px-8 py-3 bg-orange-500 text-white rounded-xl font-semibold hover:bg-orange-600 transition-colors"
               >

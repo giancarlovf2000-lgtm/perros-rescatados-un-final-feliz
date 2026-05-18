@@ -17,47 +17,42 @@ interface AdoptionFormProps {
 type FormState = Record<string, string | boolean>
 
 function RadioGroup({
-  name,
   label,
   options,
   value,
   onChange,
   required,
+  error,
 }: {
-  name: string
   label: string
   options: { value: string; label: string }[]
   value: string
   onChange: (v: string) => void
   required?: boolean
+  error?: string
 }) {
   return (
     <div className="space-y-2">
       <Label className="text-sm font-medium text-gray-700">
         {label}{required && <span className="text-red-500 ml-0.5">*</span>}
       </Label>
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap gap-2">
         {options.map(opt => (
-          <label
+          <button
             key={opt.value}
-            className={`flex items-center gap-2 cursor-pointer px-3 py-2 rounded-lg border text-sm transition-colors ${
+            type="button"
+            onClick={() => onChange(opt.value)}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-colors ${
               value === opt.value
                 ? 'border-orange-500 bg-orange-50 text-orange-700 font-medium'
                 : 'border-gray-200 hover:border-orange-300 text-gray-600'
             }`}
           >
-            <input
-              type="radio"
-              name={name}
-              value={opt.value}
-              checked={value === opt.value}
-              onChange={() => onChange(opt.value)}
-              className="sr-only"
-            />
             {opt.value === value ? '●' : '○'} {opt.label}
-          </label>
+          </button>
         ))}
       </div>
+      {error && <p className="text-xs text-red-500">{error}</p>}
     </div>
   )
 }
@@ -87,6 +82,7 @@ export function AdoptionForm({ perro, onSuccess, onCancel }: AdoptionFormProps) 
     consciente_responsabilidad: '', motivo: '', cualidades_buscadas: '', algo_mas: '',
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [showBanner, setShowBanner] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
 
@@ -95,17 +91,37 @@ export function AdoptionForm({ perro, onSuccess, onCancel }: AdoptionFormProps) 
 
   const validate = () => {
     const e: Record<string, string> = {}
+    // Sección 1
     if (!String(form.nombre_adoptante).trim()) e.nombre_adoptante = 'Requerido'
     if (!String(form.edad).trim()) e.edad = 'Requerido'
     if (!String(form.direccion).trim()) e.direccion = 'Requerido'
     if (!String(form.telefono).trim()) e.telefono = 'Requerido'
     if (!String(form.email).trim() || !String(form.email).includes('@')) e.email = 'Correo válido requerido'
     if (!String(form.ocupacion).trim()) e.ocupacion = 'Requerido'
+    // Sección 2
     if (!String(form.tipo_vivienda)) e.tipo_vivienda = 'Requerido'
-    if (!String(form.motivo).trim()) e.motivo = 'Requerido'
+    if (!String(form.vivienda_es)) e.vivienda_es = 'Requerido'
+    // Sección 3
+    if (!String(form.donde_estara_perrito)) e.donde_estara_perrito = 'Requerido'
+    if (!String(form.patio_verjado)) e.patio_verjado = 'Requerido'
+    if (!String(form.horas_solo).trim()) e.horas_solo = 'Requerido'
+    // Sección 4
+    if (!String(form.personas_en_hogar).trim()) e.personas_en_hogar = 'Requerido'
+    if (!String(form.todos_de_acuerdo)) e.todos_de_acuerdo = 'Requerido'
+    // Sección 5
+    if (!String(form.ha_tenido_perros)) e.ha_tenido_perros = 'Requerido'
+    if (!String(form.tiene_otras_mascotas)) e.tiene_otras_mascotas = 'Requerido'
+    if (!String(form.tiene_veterinario)) e.tiene_veterinario = 'Requerido'
+    // Sección 6
+    if (!String(form.dispuesto_gastos_vet)) e.dispuesto_gastos_vet = 'Requerido'
     if (!form.consciente_necesidades) e.consciente_necesidades = 'Debes confirmar este punto'
+    if (!String(form.consciente_responsabilidad)) e.consciente_responsabilidad = 'Requerido'
+    // Sección 7
+    if (!String(form.motivo).trim()) e.motivo = 'Requerido'
     setErrors(e)
-    return Object.keys(e).length === 0
+    const hasErrors = Object.keys(e).length > 0
+    setShowBanner(hasErrors)
+    return !hasErrors
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -142,6 +158,13 @@ export function AdoptionForm({ perro, onSuccess, onCancel }: AdoptionFormProps) 
           Nos reservamos el derecho de aprobar la adopción según el bienestar del animal.
         </p>
       </div>
+
+      {/* Error banner */}
+      {showBanner && (
+        <div className="bg-red-50 border border-red-200 rounded-xl p-3 text-sm text-red-600 font-medium">
+          ⚠️ Por favor completa todos los campos obligatorios antes de enviar.
+        </div>
+      )}
 
       {/* Perro seleccionado */}
       <div className="bg-orange-50 rounded-xl p-3 flex items-center gap-3">
@@ -193,9 +216,10 @@ export function AdoptionForm({ perro, onSuccess, onCancel }: AdoptionFormProps) 
       <div className="border border-gray-100 rounded-xl p-4 space-y-4">
         <SectionHeader number={2} title="Vivienda" />
         <RadioGroup
-          name="tipo_vivienda" label="Tipo de vivienda" required
+          label="Tipo de vivienda" required
           value={String(form.tipo_vivienda)}
           onChange={v => set('tipo_vivienda', v)}
+          error={errors.tipo_vivienda}
           options={[
             { value: 'casa', label: 'Casa' },
             { value: 'apartamento', label: 'Apartamento' },
@@ -203,7 +227,6 @@ export function AdoptionForm({ perro, onSuccess, onCancel }: AdoptionFormProps) 
             { value: 'otro', label: 'Otro' },
           ]}
         />
-        {errors.tipo_vivienda && <p className="text-xs text-red-500">{errors.tipo_vivienda}</p>}
         {form.tipo_vivienda === 'otro' && (
           <div className="space-y-1">
             <Label htmlFor="tipo_vivienda_otro">Especifica el tipo de vivienda</Label>
@@ -211,9 +234,10 @@ export function AdoptionForm({ perro, onSuccess, onCancel }: AdoptionFormProps) 
           </div>
         )}
         <RadioGroup
-          name="vivienda_es" label="La vivienda es:"
+          label="La vivienda es:" required
           value={String(form.vivienda_es)}
           onChange={v => set('vivienda_es', v)}
+          error={errors.vivienda_es}
           options={[
             { value: 'propia', label: 'Propia' },
             { value: 'alquilada', label: 'Alquilada' },
@@ -222,7 +246,7 @@ export function AdoptionForm({ perro, onSuccess, onCancel }: AdoptionFormProps) 
         />
         {form.vivienda_es === 'alquilada' && (
           <RadioGroup
-            name="alquiler_permite_mascotas" label="Si es alquilada, ¿permiten mascotas?"
+            label="Si es alquilada, ¿permiten mascotas?"
             value={String(form.alquiler_permite_mascotas)}
             onChange={v => set('alquiler_permite_mascotas', v)}
             options={[
@@ -238,9 +262,10 @@ export function AdoptionForm({ perro, onSuccess, onCancel }: AdoptionFormProps) 
       <div className="border border-gray-100 rounded-xl p-4 space-y-4">
         <SectionHeader number={3} title="Espacio para el Perrito" />
         <RadioGroup
-          name="donde_estara_perrito" label="¿Dónde estará el perrito mayormente?"
+          label="¿Dónde estará el perrito mayormente?" required
           value={String(form.donde_estara_perrito)}
           onChange={v => set('donde_estara_perrito', v)}
+          error={errors.donde_estara_perrito}
           options={[
             { value: 'adentro', label: 'Mayoría del tiempo adentro' },
             { value: 'patio', label: 'Mayoría del tiempo en el patio' },
@@ -248,9 +273,10 @@ export function AdoptionForm({ perro, onSuccess, onCancel }: AdoptionFormProps) 
           ]}
         />
         <RadioGroup
-          name="patio_verjado" label="El patio está completamente verjado"
+          label="El patio está completamente verjado" required
           value={String(form.patio_verjado)}
           onChange={v => set('patio_verjado', v)}
+          error={errors.patio_verjado}
           options={[
             { value: 'si', label: 'Sí' },
             { value: 'no', label: 'No' },
@@ -258,8 +284,9 @@ export function AdoptionForm({ perro, onSuccess, onCancel }: AdoptionFormProps) 
           ]}
         />
         <div className="space-y-1">
-          <Label htmlFor="horas_solo">¿Cuántas horas al día estaría solo el perro?</Label>
+          <Label htmlFor="horas_solo">¿Cuántas horas al día estaría solo el perro? <span className="text-red-500">*</span></Label>
           <Input id="horas_solo" value={String(form.horas_solo)} onChange={e => set('horas_solo', e.target.value)} placeholder="Ej: 4 horas" />
+          {errors.horas_solo && <p className="text-xs text-red-500">{errors.horas_solo}</p>}
         </div>
         <div className="space-y-1">
           <Label htmlFor="que_ocurrira_si_mudas">¿Qué ocurrirá con el perro si te mudas?</Label>
@@ -272,8 +299,9 @@ export function AdoptionForm({ perro, onSuccess, onCancel }: AdoptionFormProps) 
         <SectionHeader number={4} title="El Hogar" />
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1">
-            <Label htmlFor="personas_en_hogar">¿Cuántas personas viven en el hogar?</Label>
+            <Label htmlFor="personas_en_hogar">¿Cuántas personas viven en el hogar? <span className="text-red-500">*</span></Label>
             <Input id="personas_en_hogar" value={String(form.personas_en_hogar)} onChange={e => set('personas_en_hogar', e.target.value)} placeholder="Ej: 3" />
+            {errors.personas_en_hogar && <p className="text-xs text-red-500">{errors.personas_en_hogar}</p>}
           </div>
           <div className="space-y-1">
             <Label htmlFor="hay_ninos_edades">¿Hay niños? Indique edades</Label>
@@ -281,9 +309,10 @@ export function AdoptionForm({ perro, onSuccess, onCancel }: AdoptionFormProps) 
           </div>
         </div>
         <RadioGroup
-          name="todos_de_acuerdo" label="¿Todos los miembros del hogar están de acuerdo con la adopción?"
+          label="¿Todos los miembros del hogar están de acuerdo con la adopción?" required
           value={String(form.todos_de_acuerdo)}
           onChange={v => set('todos_de_acuerdo', v)}
+          error={errors.todos_de_acuerdo}
           options={[
             { value: 'si', label: 'Sí' },
             { value: 'no', label: 'No' },
@@ -291,7 +320,7 @@ export function AdoptionForm({ perro, onSuccess, onCancel }: AdoptionFormProps) 
           ]}
         />
         <RadioGroup
-          name="alguien_alergico" label="¿Alguien en el hogar es alérgico a los animales?"
+          label="¿Alguien en el hogar es alérgico a los animales?"
           value={String(form.alguien_alergico)}
           onChange={v => set('alguien_alergico', v)}
           options={SI_NO}
@@ -302,9 +331,10 @@ export function AdoptionForm({ perro, onSuccess, onCancel }: AdoptionFormProps) 
       <div className="border border-gray-100 rounded-xl p-4 space-y-4">
         <SectionHeader number={5} title="Experiencia con Mascotas" />
         <RadioGroup
-          name="ha_tenido_perros" label="¿Has tenido perros anteriormente?"
+          label="¿Has tenido perros anteriormente?" required
           value={String(form.ha_tenido_perros)}
           onChange={v => set('ha_tenido_perros', v)}
+          error={errors.ha_tenido_perros}
           options={SI_NO}
         />
         {form.ha_tenido_perros === 'si' && (
@@ -314,9 +344,10 @@ export function AdoptionForm({ perro, onSuccess, onCancel }: AdoptionFormProps) 
           </div>
         )}
         <RadioGroup
-          name="tiene_otras_mascotas" label="¿Actualmente tienes otras mascotas?"
+          label="¿Actualmente tienes otras mascotas?" required
           value={String(form.tiene_otras_mascotas)}
           onChange={v => set('tiene_otras_mascotas', v)}
+          error={errors.tiene_otras_mascotas}
           options={[
             { value: 'si', label: 'Sí' },
             { value: 'no', label: 'No' },
@@ -325,7 +356,7 @@ export function AdoptionForm({ perro, onSuccess, onCancel }: AdoptionFormProps) 
         />
         {form.tiene_otras_mascotas === 'si' && (
           <RadioGroup
-            name="mascotas_esterilizadas" label="¿Están esterilizadas y vacunadas?"
+            label="¿Están esterilizadas y vacunadas?"
             value={String(form.mascotas_esterilizadas)}
             onChange={v => set('mascotas_esterilizadas', v)}
             options={[
@@ -337,9 +368,10 @@ export function AdoptionForm({ perro, onSuccess, onCancel }: AdoptionFormProps) 
           />
         )}
         <RadioGroup
-          name="tiene_veterinario" label="¿Tienes veterinario actualmente?"
+          label="¿Tienes veterinario actualmente?" required
           value={String(form.tiene_veterinario)}
           onChange={v => set('tiene_veterinario', v)}
+          error={errors.tiene_veterinario}
           options={SI_NO}
         />
       </div>
@@ -348,9 +380,10 @@ export function AdoptionForm({ perro, onSuccess, onCancel }: AdoptionFormProps) 
       <div className="border border-gray-100 rounded-xl p-4 space-y-4">
         <SectionHeader number={6} title="Compromiso" />
         <RadioGroup
-          name="dispuesto_gastos_vet" label="¿Estás dispuesto(a) a cubrir gastos veterinarios, vacunas y esterilización?"
+          label="¿Estás dispuesto(a) a cubrir gastos veterinarios, vacunas y esterilización?" required
           value={String(form.dispuesto_gastos_vet)}
           onChange={v => set('dispuesto_gastos_vet', v)}
+          error={errors.dispuesto_gastos_vet}
           options={SI_NO}
         />
         <div className="space-y-1">
@@ -379,14 +412,15 @@ export function AdoptionForm({ perro, onSuccess, onCancel }: AdoptionFormProps) 
             className="w-4 h-4 mt-0.5 accent-orange-500 flex-shrink-0"
           />
           <span className="text-sm text-gray-700">
-            ¿Estás consciente que los perritos rescatados necesitan tiempo, paciencia y amor para adaptarse en su nuevo hogar?
+            ¿Estás consciente que los perritos rescatados necesitan tiempo, paciencia y amor para adaptarse en su nuevo hogar? <span className="text-red-500">*</span>
           </span>
         </label>
         {errors.consciente_necesidades && <p className="text-xs text-red-500">{errors.consciente_necesidades}</p>}
         <RadioGroup
-          name="consciente_responsabilidad" label="¿Estás consciente de la responsabilidad que conlleva tener una mascota?"
+          label="¿Estás consciente de la responsabilidad que conlleva tener una mascota?" required
           value={String(form.consciente_responsabilidad)}
           onChange={v => set('consciente_responsabilidad', v)}
+          error={errors.consciente_responsabilidad}
           options={SI_NO}
         />
       </div>
