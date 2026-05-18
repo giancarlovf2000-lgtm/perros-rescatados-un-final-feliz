@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { SiteHeader } from '@/components/public/SiteHeader'
 import { SiteFooter } from '@/components/public/SiteFooter'
+import { FosterModal } from '@/components/public/FosterModal'
 
 export const metadata: Metadata = {
   title: 'Ángeles Cuidadores (Foster)',
@@ -116,12 +117,7 @@ export default function AngelesCuidadoresPage() {
         <p className="text-gray-500 text-sm max-w-md mx-auto">
           Contáctanos para conocer más sobre el proceso y cómo puedes ayudar.
         </p>
-        <a
-          href="mailto:giancarlovf2000@gmail.com"
-          className="inline-block bg-orange-500 hover:bg-orange-600 text-white font-bold px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-all text-lg"
-        >
-          Quiero ser Foster 🐾
-        </a>
+        <FosterModal />
       </section>
 
       <SiteFooter />

@@ -17,6 +17,16 @@ export interface Perro {
   created_at: string
 }
 
+export interface MensajeFoster {
+  id: string
+  nombre: string
+  email: string | null
+  telefono: string | null
+  mensaje: string
+  leido: boolean
+  created_at: string
+}
+
 export interface Solicitud {
   id: string
   perro_id: string | null

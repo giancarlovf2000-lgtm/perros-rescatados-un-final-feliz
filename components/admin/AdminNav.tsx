@@ -9,6 +9,7 @@ const links = [
   { href: '/admin/dashboard', label: 'Inicio', icon: '🏠' },
   { href: '/admin/perros', label: 'Perros', icon: '🐾' },
   { href: '/admin/solicitudes', label: 'Solicitudes', icon: '📋' },
+  { href: '/admin/mensajes', label: 'Mensajes Foster', icon: '💌' },
 ]
 
 export function AdminNav() {
