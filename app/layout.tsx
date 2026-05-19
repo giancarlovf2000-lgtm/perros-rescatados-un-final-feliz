@@ -26,6 +26,11 @@ export const metadata: Metadata = {
     title: "Perros Rescatados — Un Final Feliz",
     description: "Adopta a un perro rescatado y dale el hogar que merece.",
   },
+  icons: {
+    icon: [{ url: '/favicon.png', type: 'image/png' }],
+    apple: [{ url: '/apple-touch-icon.png', type: 'image/png' }],
+    shortcut: '/favicon.png',
+  },
   themeColor: "#F97316",
   viewport: "width=device-width, initial-scale=1, maximum-scale=5",
 };
