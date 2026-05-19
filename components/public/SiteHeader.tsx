@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 
 const navLinks = [
@@ -25,7 +26,7 @@ export function SiteHeader() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between gap-4">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-            <span className="text-xl sm:text-2xl">🐾</span>
+            <Image src="/logo.png" alt="Un Final Feliz" width={36} height={36} className="rounded-full flex-shrink-0" />
             <div>
               <span className="font-bold text-orange-600 text-sm sm:text-base leading-tight block">Perros Rescatados</span>
               <span className="text-xs text-amber-700 leading-tight block">Un Final Feliz</span>
@@ -78,7 +79,7 @@ export function SiteHeader() {
       >
         <div className="flex items-center justify-between p-5 border-b border-gray-100">
           <div className="flex items-center gap-2">
-            <span className="text-xl">🐾</span>
+            <Image src="/logo.png" alt="Un Final Feliz" width={36} height={36} className="rounded-full flex-shrink-0" />
             <div>
               <p className="font-bold text-orange-600 text-sm leading-tight">Perros Rescatados</p>
               <p className="text-xs text-amber-700 leading-tight">Un Final Feliz</p>

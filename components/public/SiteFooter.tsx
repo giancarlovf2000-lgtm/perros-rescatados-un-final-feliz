@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 
 export function SiteFooter() {
   return (
@@ -8,7 +9,7 @@ export function SiteFooter() {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-2xl">🐾</span>
+              <Image src="/logo.png" alt="Un Final Feliz" width={44} height={44} className="rounded-full flex-shrink-0" />
               <div>
                 <p className="font-bold text-white text-base leading-tight">Perros Rescatados</p>
                 <p className="text-xs text-amber-300 leading-tight">Un Final Feliz</p>

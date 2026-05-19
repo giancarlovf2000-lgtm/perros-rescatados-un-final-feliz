@@ -1,11 +1,15 @@
 import { ImageResponse } from 'next/og'
+import { readFileSync } from 'fs'
+import { join } from 'path'
 
-export const runtime = 'edge'
 export const alt = 'Perros Rescatados - Un Final Feliz'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
 export default function OGImage() {
+  const logoData = readFileSync(join(process.cwd(), 'public', 'logo.png'))
+  const logoSrc = `data:image/png;base64,${logoData.toString('base64')}`
+
   return new ImageResponse(
     <div
       style={{
@@ -13,57 +17,27 @@ export default function OGImage() {
         width: '100%',
         height: '100%',
         display: 'flex',
-        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 60,
+        gap: 56,
+        padding: '60px 80px',
       }}
     >
-      {/* Card container */}
-      <div
-        style={{
-          background: 'white',
-          borderRadius: 32,
-          padding: '60px 80px',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 16,
-          boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
-          minWidth: 600,
-        }}
-      >
-        <div style={{ fontSize: 90, lineHeight: 1 }}>🐾</div>
-        <div
-          style={{
-            fontSize: 72,
-            fontWeight: 900,
-            color: '#F97316',
-            textAlign: 'center',
-            lineHeight: 1.1,
-          }}
-        >
+      <img
+        src={logoSrc}
+        width={320}
+        height={320}
+        style={{ borderRadius: '50%', flexShrink: 0, objectFit: 'cover' }}
+      />
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div style={{ fontSize: 70, fontWeight: 900, color: 'white', lineHeight: 1.1 }}>
           Perros Rescatados
         </div>
-        <div
-          style={{
-            fontSize: 38,
-            color: '#92400E',
-            textAlign: 'center',
-            fontWeight: 600,
-          }}
-        >
+        <div style={{ fontSize: 42, color: '#FED7AA', fontWeight: 700 }}>
           Un Final Feliz
         </div>
-        <div
-          style={{
-            fontSize: 26,
-            color: '#6B7280',
-            textAlign: 'center',
-            marginTop: 8,
-          }}
-        >
-          Adopta y dale el hogar que merece 🏠
+        <div style={{ fontSize: 26, color: '#FFF7ED', marginTop: 4 }}>
+          Adopta · Rescata · Ama 🐾
         </div>
       </div>
     </div>,
