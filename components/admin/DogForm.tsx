@@ -15,13 +15,24 @@ interface DogFormProps {
   perro?: Perro
 }
 
+type PhotoEntry = { url: string; file?: File }
+
 export function DogForm({ perro }: DogFormProps) {
   const router = useRouter()
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const mainInputRef = useRef<HTMLInputElement>(null)
+  const additionalInputRef = useRef<HTMLInputElement>(null)
+
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [previewUrl, setPreviewUrl] = useState<string | null>(perro?.foto_url ?? null)
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+
+  // Main photo
+  const [mainPreview, setMainPreview] = useState<string | null>(perro?.foto_url ?? null)
+  const [mainFile, setMainFile] = useState<File | null>(null)
+
+  // Additional photos: { url (preview or existing DB url), file? (undefined = already in DB) }
+  const [additionalPhotos, setAdditionalPhotos] = useState<PhotoEntry[]>(
+    (perro?.fotos_adicionales ?? []).filter(Boolean).map(url => ({ url }))
+  )
 
   const [form, setForm] = useState({
     nombre: perro?.nombre ?? '',
@@ -35,17 +46,28 @@ export function DogForm({ perro }: DogFormProps) {
     disponible: perro?.disponible ?? true,
   })
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleMainFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
-    setSelectedFile(file)
-    setPreviewUrl(URL.createObjectURL(file))
+    setMainFile(file)
+    setMainPreview(URL.createObjectURL(file))
   }
 
-  const uploadPhoto = async (file: File): Promise<string> => {
+  const handleAdditionalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? [])
+    const newEntries = files.map(file => ({ url: URL.createObjectURL(file), file }))
+    setAdditionalPhotos(prev => [...prev, ...newEntries])
+    e.target.value = ''
+  }
+
+  const removeAdditional = (index: number) => {
+    setAdditionalPhotos(prev => prev.filter((_, i) => i !== index))
+  }
+
+  const uploadFile = async (file: File): Promise<string> => {
     const supabase = createClient()
     const ext = file.name.split('.').pop()
-    const path = `${Date.now()}.${ext}`
+    const path = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
     const { error: uploadError } = await supabase.storage
       .from('perros-fotos')
       .upload(path, file, { upsert: true })
@@ -65,10 +87,22 @@ export function DogForm({ perro }: DogFormProps) {
 
     try {
       const supabase = createClient()
-      let foto_url = perro?.foto_url ?? null
 
-      if (selectedFile) {
-        foto_url = await uploadPhoto(selectedFile)
+      // Upload main photo if new file selected
+      let foto_url = perro?.foto_url ?? null
+      if (mainFile) {
+        foto_url = await uploadFile(mainFile)
+      }
+
+      // Upload any new additional photos, keep existing URLs
+      const fotos_adicionales: string[] = []
+      for (const entry of additionalPhotos) {
+        if (entry.file) {
+          const url = await uploadFile(entry.file)
+          fotos_adicionales.push(url)
+        } else {
+          fotos_adicionales.push(entry.url)
+        }
       }
 
       const payload = {
@@ -82,6 +116,7 @@ export function DogForm({ perro }: DogFormProps) {
         esterilizado: form.esterilizado,
         disponible: form.disponible,
         foto_url,
+        fotos_adicionales,
       }
 
       if (perro) {
@@ -108,15 +143,15 @@ export function DogForm({ perro }: DogFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl">
-      {/* Foto */}
+      {/* Foto principal */}
       <div className="space-y-2">
-        <Label>Foto</Label>
+        <Label>Foto principal</Label>
         <div
           className="w-40 h-40 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer overflow-hidden bg-gray-50 hover:bg-gray-100 transition-colors relative"
-          onClick={() => fileInputRef.current?.click()}
+          onClick={() => mainInputRef.current?.click()}
         >
-          {previewUrl ? (
-            <Image src={previewUrl} alt="Preview" fill className="object-cover" />
+          {mainPreview ? (
+            <Image src={mainPreview} alt="Preview" fill className="object-cover" />
           ) : (
             <div className="text-center text-gray-400">
               <div className="text-3xl mb-1">📷</div>
@@ -125,11 +160,46 @@ export function DogForm({ perro }: DogFormProps) {
           )}
         </div>
         <input
-          ref={fileInputRef}
+          ref={mainInputRef}
           type="file"
           accept="image/*"
           className="hidden"
-          onChange={handleFileChange}
+          onChange={handleMainFileChange}
+        />
+      </div>
+
+      {/* Fotos adicionales */}
+      <div className="space-y-2">
+        <Label>Fotos adicionales</Label>
+        <div className="flex flex-wrap gap-2">
+          {additionalPhotos.map((entry, i) => (
+            <div key={i} className="relative w-20 h-20 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0">
+              <Image src={entry.url} alt="" fill className="object-cover" sizes="80px" />
+              <button
+                type="button"
+                onClick={() => removeAdditional(i)}
+                className="absolute top-0.5 right-0.5 bg-black/60 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center leading-none hover:bg-black/80"
+              >
+                ×
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={() => additionalInputRef.current?.click()}
+            className="w-20 h-20 rounded-lg border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400 hover:bg-gray-50 transition-colors flex-shrink-0"
+          >
+            <span className="text-2xl leading-none">+</span>
+            <span className="text-xs mt-0.5">Añadir</span>
+          </button>
+        </div>
+        <input
+          ref={additionalInputRef}
+          type="file"
+          accept="image/*"
+          multiple
+          className="hidden"
+          onChange={handleAdditionalChange}
         />
       </div>
 

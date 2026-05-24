@@ -11,6 +11,7 @@ export interface Perro {
   tamano: Tamano | null
   descripcion: string | null
   foto_url: string | null
+  fotos_adicionales: string[] | null
   vacunado: boolean
   esterilizado: boolean
   disponible: boolean

@@ -8,10 +8,10 @@ import type { Perro } from '@/lib/types'
 
 interface DogCardProps {
   perro: Perro
-  onAdoptar: (perro: Perro) => void
+  onVerPerfil: (perro: Perro) => void
 }
 
-export function DogCard({ perro, onAdoptar }: DogCardProps) {
+export function DogCard({ perro, onVerPerfil }: DogCardProps) {
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col">
       <div className="relative aspect-square bg-amber-50">
@@ -75,10 +75,10 @@ export function DogCard({ perro, onAdoptar }: DogCardProps) {
 
       <CardFooter className="p-4 pt-0">
         <Button
-          onClick={() => onAdoptar(perro)}
+          onClick={() => onVerPerfil(perro)}
           className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold"
         >
-          ¡Adóptame!
+          Ver perfil 🐾
         </Button>
       </CardFooter>
     </Card>

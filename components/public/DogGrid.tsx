@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { DogCard } from './DogCard'
+import { DogProfileModal } from './DogProfileModal'
 import { AdoptionModal } from './AdoptionModal'
 import type { Perro } from '@/lib/types'
 
@@ -10,7 +11,8 @@ interface DogGridProps {
 }
 
 export function DogGrid({ perros }: DogGridProps) {
-  const [selectedPerro, setSelectedPerro] = useState<Perro | null>(null)
+  const [profilePerro, setProfilePerro] = useState<Perro | null>(null)
+  const [adoptPerro, setAdoptPerro] = useState<Perro | null>(null)
 
   const disponibles = perros.filter(p => p.disponible)
 
@@ -30,15 +32,24 @@ export function DogGrid({ perros }: DogGridProps) {
             <DogCard
               key={perro.id}
               perro={perro}
-              onAdoptar={setSelectedPerro}
+              onVerPerfil={setProfilePerro}
             />
           ))}
         </div>
       )}
 
+      <DogProfileModal
+        perro={profilePerro}
+        onClose={() => setProfilePerro(null)}
+        onAdoptar={p => {
+          setProfilePerro(null)
+          setAdoptPerro(p)
+        }}
+      />
+
       <AdoptionModal
-        perro={selectedPerro}
-        onClose={() => setSelectedPerro(null)}
+        perro={adoptPerro}
+        onClose={() => setAdoptPerro(null)}
       />
     </>
   )
