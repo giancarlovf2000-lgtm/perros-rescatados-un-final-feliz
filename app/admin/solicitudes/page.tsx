@@ -23,47 +23,53 @@ export default async function SolicitudesPage() {
           <p>No hay solicitudes aún.</p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-100">
-              <tr>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">Adoptante</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600 hidden sm:table-cell">Perro</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600 hidden md:table-cell">Fecha</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">Estado</th>
-                <th className="px-4 py-3"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {(solicitudes as Solicitud[]).map(sol => (
-                <tr key={sol.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-4 py-3">
-                    <div className="font-medium text-gray-900">{sol.nombre_adoptante}</div>
-                    <div className="text-gray-400 text-xs">{sol.email}</div>
-                  </td>
-                  <td className="px-4 py-3 text-gray-600 hidden sm:table-cell">
-                    {sol.perros?.nombre ?? '—'}
-                  </td>
-                  <td className="px-4 py-3 text-gray-500 hidden md:table-cell">
-                    {new Date(sol.created_at).toLocaleDateString('es-MX', {
-                      day: 'numeric', month: 'short', year: 'numeric'
-                    })}
-                  </td>
-                  <td className="px-4 py-3">
-                    <StatusBadge estado={sol.estado} />
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <Link
-                      href={`/admin/solicitudes/${sol.id}`}
-                      className="text-xs text-blue-600 hover:underline"
-                    >
-                      Ver detalles
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 divide-y divide-gray-50">
+          {/* Encabezado de columnas (solo desktop) */}
+          <div className="hidden md:flex items-center gap-4 px-5 py-3 bg-gray-50 text-xs font-medium text-gray-600 rounded-t-xl">
+            <span className="flex-1">Adoptante</span>
+            <span className="w-40">Perro</span>
+            <span className="w-32">Fecha</span>
+            <span className="w-28">Estado</span>
+            <span className="w-28 text-right">&nbsp;</span>
+          </div>
+
+          {(solicitudes as Solicitud[]).map(sol => (
+            <Link
+              key={sol.id}
+              href={`/admin/solicitudes/${sol.id}`}
+              className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4 px-5 py-4 hover:bg-gray-50 transition-colors"
+            >
+              {/* Adoptante */}
+              <div className="flex-1 min-w-0">
+                <div className="font-medium text-gray-900 truncate">{sol.nombre_adoptante}</div>
+                <div className="text-gray-400 text-xs truncate">{sol.email}</div>
+              </div>
+
+              {/* Perro */}
+              <div className="text-sm text-gray-600 md:w-40">
+                <span className="md:hidden text-gray-400">Perro: </span>
+                {sol.perros?.nombre ?? '—'}
+              </div>
+
+              {/* Fecha */}
+              <div className="text-sm text-gray-500 md:w-32">
+                <span className="md:hidden text-gray-400">Fecha: </span>
+                {new Date(sol.created_at).toLocaleDateString('es-MX', {
+                  day: 'numeric', month: 'short', year: 'numeric'
+                })}
+              </div>
+
+              {/* Estado + acción */}
+              <div className="flex items-center justify-between gap-3 md:w-56 md:justify-start">
+                <div className="md:w-28">
+                  <StatusBadge estado={sol.estado} />
+                </div>
+                <span className="text-xs font-medium text-blue-600 whitespace-nowrap md:w-28 md:text-right">
+                  Ver detalles →
+                </span>
+              </div>
+            </Link>
+          ))}
         </div>
       )}
     </div>
